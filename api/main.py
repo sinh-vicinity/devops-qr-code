@@ -13,7 +13,8 @@ app = FastAPI()
 
 # Allowing CORS for local testing
 origins = [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "*"
 ]
 
 app.add_middleware(
@@ -24,12 +25,9 @@ app.add_middleware(
 )
 
 # AWS S3 Configuration
-s3 = boto3.client(
-    's3',
-    aws_access_key_id= os.getenv("AWS_ACCESS_KEY"),
-    aws_secret_access_key= os.getenv("AWS_SECRET_KEY"))
+s3 = boto3.client('s3')
 
-bucket_name = 'YOUR_BUCKET_NAME' # Add your bucket name here
+bucket_name = 'devopsexamplegh' # Add your bucket name here
 
 @app.post("/generate-qr/")
 async def generate_qr(url: str):
@@ -55,7 +53,7 @@ async def generate_qr(url: str):
 
     try:
         # Upload to S3
-        s3.put_object(Bucket=bucket_name, Key=file_name, Body=img_byte_arr, ContentType='image/png', ACL='public-read')
+        s3.put_object(Bucket=bucket_name, Key=file_name, Body=img_byte_arr, ContentType='image/png')
         
         # Generate the S3 URL
         s3_url = f"https://{bucket_name}.s3.amazonaws.com/{file_name}"
